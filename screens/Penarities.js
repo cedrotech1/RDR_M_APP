@@ -1,35 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Button } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Button, ActivityIndicator,  } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { REACT_APP_BASE_URL } from '@env';
+
 const LandingPage = () => {
   const navigation = useNavigation();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
-    const [token, setToken] = useState(null); 
-
+  const [token, setToken] = useState(null); 
 
   useEffect(() => {
-    const loadUserData = async () => {
-      const user = await AsyncStorage.getItem('user');
-      const storedToken = await AsyncStorage.getItem('token'); // Retrieve token from AsyncStorage
-      if (user) {
-        const parsedUser = JSON.parse(user);
-      
-        setUserId(parsedUser.id);
-      }
-      if (storedToken) {
-        setToken(storedToken); // Set token in state
+    const loadToken = async () => {
+      try {
+        const storedToken = await AsyncStorage.getItem('token');
+        if (storedToken) {
+          setToken(storedToken);
+        }
+      } catch (error) {
+        console.error('Error retrieving token', error);
       }
     };
-
-    loadUserData();
+    loadToken();
   }, []);
+
   useEffect(() => {
     const fetchAppointments = async () => {
+      if (!token) return;  // Prevent fetching if there's no token
+
       try {
         const response = await fetch(
-          `https://military-lp8n.onrender.com/api/v1/appointment/user`,
+          `${REACT_APP_BASE_URL}/api/v1/appoitment/user`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -38,11 +39,21 @@ const LandingPage = () => {
           }
         );
 
-        const data = await response.json();
-        if (data.success) {
-          setAppointments(data.data);
-        } else {
-          console.error('Failed to fetch appointments:', data.message);
+        // Log the raw response for debugging
+        const text = await response.text();
+        console.log('Raw Response:', text);
+
+        // Check if the response is JSON
+        try {
+          const data = JSON.parse(text);
+          if (data.success) {
+            setAppointments(data.data);
+          } else {
+            console.error('Failed to fetch appointments:', data.message);
+          }
+        } catch (error) {
+          console.error('Error parsing JSON:', error);
+          // If it's not JSON, handle it accordingly (e.g., show an error message)
         }
       } catch (error) {
         console.error('Error fetching appointments:', error);
@@ -52,10 +63,10 @@ const LandingPage = () => {
     };
 
     fetchAppointments();
-  }, [token]);
+  }, [token]);  // Dependency on token to refetch when token changes
 
   if (loading) {
-    return <Text>Loading...</Text>;
+    return <Text><ActivityIndicator size="large" color="green" style={styles.loader} /></Text>;
   }
 
   return (
@@ -95,13 +106,23 @@ const LandingPage = () => {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    backgroundColor: '#f5f5f5',
+    flex: 1,
+    backgroundColor: "#c7fcd0",
   },
   header: {
     fontSize: 24,
+    backgroundColor:'white',
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 20,
+    padding: 16,
+    color:'green'
+  },
+  loader: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+ 
   },
   card: {
     backgroundColor: 'white',

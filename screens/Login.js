@@ -3,13 +3,18 @@ import { TextInput, TouchableOpacity, View, Text, ActivityIndicator } from 'reac
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage'; 
 import styles from '../components/loginStyle'; 
+import { REACT_APP_BASE_URL } from '@env';
 
-const Login = ({ onLogin }) => {
+const Login = ({ route  }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  console.log("User logged in!");
+  const onLogin = route?.params?.onLogin;
+
+
 
   const isValidEmail = (email) => {
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
@@ -21,28 +26,36 @@ const Login = ({ onLogin }) => {
       setError('Please fill in both fields');
       return;
     }
-
+  
     if (!isValidEmail(email)) {
       setError('Please enter a valid email');
       return;
     }
-
+  
     setError('');
     setSuccessMessage('');
     setIsLoading(true);
-
+  
     try {
-      const response = await axios.post('https://military-lp8n.onrender.com/api/v1/auth/login', {
+      const response = await axios.post(`${REACT_APP_BASE_URL}/api/v1/auth/login`, {
         email,
         password,
       });
-
+  
       if (response.data.success) {
+        const user = response.data.user;
+        
+        // Check if the user role is 'citizen'
+        if (user.role !== 'user') {
+          setError('You must be a soldier to log in.');
+          return;
+        }
+  
         await AsyncStorage.setItem('token', response.data.token);
-        await AsyncStorage.setItem('user', JSON.stringify(response.data.user));
-
-        setSuccessMessage('Login successful!');
-        onLogin();
+        await AsyncStorage.setItem('user', JSON.stringify(user));
+  
+        // Proceed with the login process after successful role check
+        onLogin();  // Redirect to another screen after successful login
       } else {
         setError(response.data.message || 'Login failed');
       }
@@ -59,6 +72,7 @@ const Login = ({ onLogin }) => {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <View style={styles.container}>
@@ -87,11 +101,11 @@ const Login = ({ onLogin }) => {
       {successMessage ? <Text style={styles.successText}>{successMessage}</Text> : null}
 
       <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={isLoading}>
-        <Text style={styles.buttonText}>{isLoading ? 'Logging in...' : 'Login'}</Text>
+        <Text style={styles.buttonText}>{isLoading ? <ActivityIndicator size="large" color="white" style={styles.loader} />: 'Login'}</Text>
       </TouchableOpacity>
 
       {/* Loading Indicator */}
-      {isLoading && <ActivityIndicator size="large" color="#3498db" style={styles.loader} />}
+      {/* {isLoading && <ActivityIndicator size="large" color="#3498db" style={styles.loader} />} */}
     </View>
   );
 };

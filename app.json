@@ -7,7 +7,7 @@
     "icon": "./assets/RDF_LOGO.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/RDF_LOGO.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -16,13 +16,25 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/RDF_LOGO.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.cedro23.snack52307d09f76a4e6ca3fe30994a4bdae4"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/RDF_LOGO.png"
     },
-    "newArchEnabled": true
+    "newArchEnabled": true,
+    "extra": {
+      "eas": {
+        "projectId": "18ec2418-0dc4-450d-87bd-8910f2e568b4"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/18ec2418-0dc4-450d-87bd-8910f2e568b4"
+    }
   }
 }
