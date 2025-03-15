@@ -5,10 +5,10 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from 'react-native-vector-icons';
-import Posts from './screens/Posts';
+import Mission from './screens/Mission';
 import Notifications from './screens/notification';
 import Profile from './screens/profile';
-import Penarities from './screens/Penarities';
+import Appoitments from './screens/Appoitments';
 import Login from './screens/Login';
 
 
@@ -44,7 +44,7 @@ export default function App() {
 
             <Tab.Screen
               name="Mission"
-              component={Posts}
+              component={Mission}
               options={{
                 tabBarIcon: ({ color, size }) => (
                   <MaterialCommunityIcons name="map-marker" color={color} size={size} />
@@ -54,7 +54,7 @@ export default function App() {
             />
             <Tab.Screen
               name="Appoitment"
-              component={Penarities}
+              component={Appoitments}
               options={{
                 tabBarIcon: ({ color, size }) => (
                   <MaterialCommunityIcons name="calendar-check" color={color} size={size} />
